@@ -1,0 +1,42 @@
+org: francishuerta
+service: api-sismos-igp
+
+package:
+  patterns:
+    - "!__pycache__/**"
+    - "!*.pyc"
+    - "!README.md"
+
+provider:
+  name: aws
+  runtime: python3.12
+  memorySize: 1024
+  timeout: 30
+  iam:
+    role: arn:aws:iam::979121676582:role/LabRole
+  environment:
+    IGP_SISMOS_TABLE: UltimosSismosIGP
+    IGP_REPORTS_ENDPOINT: https://ultimosismo.igp.gob.pe/api/ultimo-sismo/ajaxb
+
+functions:
+  scrape_latest_earthquakes:
+    handler: scrap_sismos_igp.lambda_handler
+    events:
+      - http:
+          path: /scrape/sismos
+          method: get
+          cors: true
+
+resources:
+  Resources:
+    UltimosSismosIGP:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: UltimosSismosIGP
+        AttributeDefinitions:
+          - AttributeName: codigo
+            AttributeType: S
+        KeySchema:
+          - AttributeName: codigo
+            KeyType: HASH
+        BillingMode: PAY_PER_REQUEST

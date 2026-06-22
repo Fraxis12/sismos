@@ -1,0 +1,2 @@
+# No se agregan dependencias externas.
+# boto3 está disponible en el entorno administrado de AWS Lambda.
